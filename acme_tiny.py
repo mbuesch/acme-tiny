@@ -105,6 +105,8 @@ def get_crt(account_key, csr, acme_dir, log=LOGGER, CA=DEFAULT_CA):
 
         # make the challenge file
         challenge = [c for c in json.loads(result.decode('utf8'))['challenges'] if c['type'] == "http-01"][0]
+        if not challenge['uri'].startswith(CA + "/"):
+            raise ValueError("Got an invalid challenge uri")
         token = re.sub(r"[^A-Za-z0-9_\-]", "_", challenge['token'])
         keyauthorization = "{0}.{1}".format(token, thumbprint)
         wellknown_path = os.path.join(acme_dir, token)
